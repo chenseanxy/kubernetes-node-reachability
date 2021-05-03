@@ -6,8 +6,9 @@ name = "pypi"
 [packages]
 kubernetes = "*"
 cachetools = "*"
-flask = "*"
-flask-restful = "*"
+Flask = "*"
+pyyaml = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

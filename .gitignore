@@ -1,4 +1,9 @@
 
+.env
+
+# probe.yml should be generated
+manifests/probe.yml
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,vscode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,vscode
 

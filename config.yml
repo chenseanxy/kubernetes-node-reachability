@@ -1,0 +1,2 @@
+kube:
+  NODE_META_TTL: 360
