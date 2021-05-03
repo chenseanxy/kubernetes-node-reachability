@@ -1,2 +1,5 @@
 kube:
   NODE_META_TTL: 360
+reachability:
+  flags:
+    KUBE_API_ERROR: 0
