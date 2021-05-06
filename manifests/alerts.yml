@@ -1,0 +1,156 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: k8s
+    role: alert-rules
+  name: reachability-rule
+spec:
+  groups:
+  - name: ./reachability-cluster-health.rules
+    rules:
+    - alert: ProbeTargetDown
+      expr: |
+        100 * (
+          count by() (up{job="monitoring/reachability", namespace="monitoring"} == 0) 
+            / 
+          count by() (up{job="monitoring/reachability", namespace="monitoring"})
+        ) > 10
+      annotations:
+        summary: >-
+          {{ printf "%.4g" $value }}% of probe targets are down.
+      labels:
+        category: reachability
+    - alert: ProbeFailed
+      expr: |
+        100 * (
+          count by() (probe_success{job="monitoring/reachability", namespace="monitoring"} == 0) 
+            / 
+          count by() (probe_success{job="monitoring/reachability", namespace="monitoring"})
+        ) > 1
+      annotations:
+        summary: >-
+          {{ printf "%.4g" $value }}% of probes have failed.
+      labels:
+        category: reachability
+    - alert: ProbeLatencyAvg
+      expr: |
+        avg by () (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          )
+        ) > 10
+      annotations:
+        summary: >-
+          Average probe latency high at {{ printf "%.4g" $value }}ms.
+        descriptions: >-
+          Average latency (avg of last 10s) across all routes higher than 10ms.
+      labels:
+        category: reachability
+    - alert: ProbeLatencyCount
+      expr: |
+        count by () (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          ) > 10
+        ) 
+          /
+        count by () (
+          probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}
+        ) 
+          * 100 > 10
+      annotations:
+        summary: >-
+          Probe latency high for {{ $value }}% of routes.
+        description: >-
+          More than 10% of all routes have more than 10ms of latency (avg of last 10s).
+      labels:
+        category: reachability
+  - name: ./reachability-route-health.rules
+    rules:
+    - alert: RouteProbeFailed
+      expr: | 
+        max_over_time(
+          probe_success{job="monitoring/reachability", namespace="monitoring"}[10s]
+        ) == 0
+      annotations:
+        summary: >-
+          Route probe from {{ $labels.source }} to {{ $labels.target }} have failed 
+          (for more than 10s).          
+    - alert: RouteLatency
+      expr: | 
+        1000 * avg_over_time(
+          probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+        ) > 10
+      annotations:
+        summary: >-
+          Route latency from {{ $labels.source }} to {{ $labels.target }} at 
+          {{ printf "%.4g" $value }}ms (avg for last 10s).
+      labels:
+        category: reachability
+  - name: ./reachability-node-health.rules
+    rules:
+    - alert: NodeProbeFailed
+      expr: |
+        count by (target) (
+          max_over_time(
+            probe_success{job="monitoring/reachability", namespace="monitoring"}[10s]
+          ) == 0
+        )
+      annotations:
+        summary: >-
+          {{ $value }} probes to node {{ $labels.target }} have failed (for more than 10s).
+      labels:
+        category: reachability
+    - alert: NodeOutLatencyCount
+      expr: | 
+        count by (source) (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          ) > 10
+        )
+      annotations:
+        summary: >-
+          Node latency from {{ $labels.source }} high for {{ $value }} nodes 
+          (for last 10s).
+      labels:
+        category: reachability
+    - alert: NodeOutLatencyAvg
+      expr: | 
+        avg by (source) (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          )
+        ) > 10
+      annotations:
+        summary: >-
+          Node latency from {{ $labels.source }} high at {{ printf "%.4g" $value }}ms 
+          (avg for last 10s).
+      labels:
+        category: reachability
+    - alert: NodeInLatencyCount
+      expr: | 
+        count by (target) (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          ) > 10
+        )
+      annotations:
+        summary: >-
+          Node latency to {{ $labels.target }} high for {{ $value }} nodes 
+          (for last 10s).
+      labels:
+        category: reachability
+    - alert: NodeInLatencyAvg
+      expr: | 
+        avg by (target) (
+          1000 * avg_over_time(
+            probe_duration_seconds{job="monitoring/reachability", namespace="monitoring"}[10s]
+          )
+        ) > 10
+      annotations:
+        summary: >-
+          Node latency to {{ $labels.target }} high at {{ printf "%.4g" $value }}ms 
+          (avg for last 10s).
+      labels:
+        category: reachability
