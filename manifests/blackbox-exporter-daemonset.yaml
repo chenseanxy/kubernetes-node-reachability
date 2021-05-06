@@ -34,10 +34,10 @@ spec:
           hostPort: 19115
         resources:
           limits:
-            cpu: 40m
+            cpu: 100m
             memory: 40Mi
           requests:
-            cpu: 40m
+            cpu: 100m
             memory: 40Mi
         securityContext:
           runAsNonRoot: true
