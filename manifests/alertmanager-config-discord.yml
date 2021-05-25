@@ -10,8 +10,9 @@ spec:
     groupBy: ['alertname']
     receiver: discord
     matchers:
-    - category = reachability
+    - name: category
+      value: reachability
   receivers:
   - name: discord
-    webhook_configs:
-    - url: 'http://localhost:9094'
+    webhookConfigs:
+    - url: 'http://alertmanager-discord:9094'

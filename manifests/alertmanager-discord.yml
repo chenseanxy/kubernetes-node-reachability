@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
-namespace: monitoring
 metadata:
   name: alertmanager-discord
+  namespace: monitoring
 spec:
   selector:
     matchLabels:
