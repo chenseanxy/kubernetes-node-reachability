@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+namespace: monitoring
+metadata:
+  name: alertmanager-discord
+spec:
+  selector:
+    matchLabels:
+      app: alertmanager-discord
+  template:
+    metadata:
+      labels:
+        app: alertmanager-discord
+    spec:
+      containers:
+      - image: benjojo/alertmanager-discord
+        name: main
+        ports:
+        - containerPort: 9094
+          name: http
+        resources:
+          limits:
+            cpu: 20m
+            memory: 40Mi
+          requests:
+            cpu: 20m
+            memory: 40Mi
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+        env:
+        - name: DISCORD_WEBHOOK
+          valueFrom: 
+            secretKeyRef:
+              name: discord-webhook
+              key: address
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - operator: Exists

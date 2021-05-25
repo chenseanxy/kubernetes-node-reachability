@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: discord
+  namespace: monitoring
+  labels:
+    alertmanagerConfig: discord
+spec:
+  route:
+    groupBy: ['alertname']
+    receiver: discord
+    matchers:
+    - category = reachability
+  receivers:
+  - name: discord
+    webhook_configs:
+    - url: 'http://localhost:9094'
