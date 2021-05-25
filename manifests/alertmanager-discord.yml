@@ -36,5 +36,8 @@ spec:
               key: address
       nodeSelector:
         kubernetes.io/os: linux
+        kubernetes.io/hostname: x-k8s-0
       tolerations:
       - operator: Exists
+        key: node-role.kubernetes.io/master
+        effect: NoSchedule
