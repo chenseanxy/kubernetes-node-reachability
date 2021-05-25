@@ -5,6 +5,7 @@ metadata:
     prometheus: k8s
     role: alert-rules
   name: reachability-rule
+  namespace: monitoring
 spec:
   groups:
   - name: ./reachability-cluster-health.rules
@@ -21,6 +22,7 @@ spec:
           {{ printf "%.4g" $value }}% of probe targets are down.
       labels:
         category: reachability
+        namespace: monitoring
     - alert: ProbeFailed
       expr: |
         100 * (
@@ -33,6 +35,7 @@ spec:
           {{ printf "%.4g" $value }}% of probes have failed.
       labels:
         category: reachability
+        namespace: monitoring
     - alert: ProbeLatencyAvg
       expr: |
         avg by () (
@@ -47,6 +50,7 @@ spec:
           Average latency (avg of last 10s) across all routes higher than 10ms.
       labels:
         category: reachability
+        namespace: monitoring
     - alert: ProbeLatencyCount
       expr: |
         count by () (
@@ -66,6 +70,7 @@ spec:
           More than 10% of all routes have more than 10ms of latency (avg of last 10s).
       labels:
         category: reachability
+        namespace: monitoring
   - name: ./reachability-route-health.rules
     rules:
     - alert: RouteProbeFailed
@@ -76,7 +81,10 @@ spec:
       annotations:
         summary: >-
           Route probe from {{ $labels.source }} to {{ $labels.target }} have failed 
-          (for more than 10s).          
+          (for more than 10s). 
+      labels:
+        category: reachability
+        namespace: monitoring
     - alert: RouteLatency
       expr: | 
         1000 * avg_over_time(
@@ -88,6 +96,7 @@ spec:
           {{ printf "%.4g" $value }}ms (avg for last 10s).
       labels:
         category: reachability
+        namespace: monitoring
   - name: ./reachability-node-health.rules
     rules:
     - alert: NodeProbeFailed
@@ -102,6 +111,7 @@ spec:
           {{ $value }} probes to node {{ $labels.target }} have failed (for more than 10s).
       labels:
         category: reachability
+        namespace: monitoring
     - alert: NodeOutLatencyCount
       expr: | 
         count by (source) (
@@ -115,6 +125,7 @@ spec:
           (for last 10s).
       labels:
         category: reachability
+        namespace: monitoring
     - alert: NodeOutLatencyAvg
       expr: | 
         avg by (source) (
@@ -128,6 +139,7 @@ spec:
           (avg for last 10s).
       labels:
         category: reachability
+        namespace: monitoring
     - alert: NodeInLatencyCount
       expr: | 
         count by (target) (
@@ -141,6 +153,7 @@ spec:
           (for last 10s).
       labels:
         category: reachability
+        namespace: monitoring
     - alert: NodeInLatencyAvg
       expr: | 
         avg by (target) (
@@ -154,3 +167,4 @@ spec:
           (avg for last 10s).
       labels:
         category: reachability
+        namespace: monitoring

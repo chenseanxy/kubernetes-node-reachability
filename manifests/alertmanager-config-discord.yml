@@ -8,6 +8,9 @@ metadata:
 spec:
   route:
     groupBy: ['alertname']
+    groupInterval: 10s
+    groupWait: 1s
+    repeatInterval: 30s
     receiver: discord
     matchers:
     - name: category
@@ -15,4 +18,4 @@ spec:
   receivers:
   - name: discord
     webhookConfigs:
-    - url: 'http://alertmanager-discord:9094'
+    - url: 'http://192.168.0.231:9094'

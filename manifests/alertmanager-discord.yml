@@ -7,13 +7,15 @@ spec:
   selector:
     matchLabels:
       app: alertmanager-discord
+  
   template:
     metadata:
       labels:
         app: alertmanager-discord
     spec:
       containers:
-      - image: benjojo/alertmanager-discord
+      - image: chenseanxy/alertmanager-discord
+        imagePullPolicy: Always
         name: main
         ports:
         - containerPort: 9094
@@ -25,15 +27,9 @@ spec:
           requests:
             cpu: 20m
             memory: 40Mi
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 65534
         env:
         - name: DISCORD_WEBHOOK
-          valueFrom: 
-            secretKeyRef:
-              name: discord-webhook
-              key: address
+          value: https://discord.com/api/webhooks/846816075936170054/YPQS43TwppMiMT6UHeq4rMbL2dmQMbckrU1YeCKzkvei1foMaxARhDZg1a8qy3Zl-uZE
       nodeSelector:
         kubernetes.io/os: linux
         kubernetes.io/hostname: x-k8s-0
